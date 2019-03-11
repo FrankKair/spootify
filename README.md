@@ -2,12 +2,11 @@
 
 `spt-album-info` uses [Last.fm](https://www.last.fm/) wiki section to fetch information about the album you're currently listening to.
 
-This utility is **macOS** only since it uses **AppleScript** to get information about Spotify.
+This utility is **macOS** only since it uses **AppleScript** to get information from Spotify.
 
-```
-go build
-./spt-album-info
-```
+### Usage
+
+Run `go install` to install the package and then call `spt-album-info` on your terminal. You should see something like:
 
 ```
 https://www.last.fm/music/Led+Zeppelin/Led+Zeppelin+II/+wiki

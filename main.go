@@ -1,9 +1,24 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"os"
+)
 
 func main() {
-	albumInfo := GetAlbumInfo()
-	fmt.Println(albumInfo.URL)
-	fmt.Println(albumInfo.Info)
+	output, err := runAppleScript()
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	track := newTrack(string(output))
+	info, err := getLastfmInfo(track)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	fmt.Println(info.URL)
+	fmt.Println(info.Info)
 }
