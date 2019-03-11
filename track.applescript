@@ -7,8 +7,12 @@ on escape_quotes(string_to_escape)
   return string_to_escape
 end escape_quotes
 
-tell application "Spotify"
-  set ctrack to ""
-  set ctrack to ctrack & my escape_quotes(current track's artist) & "-"
-  set ctrack to ctrack & my escape_quotes(current track's album)
-end tell
+if application "Spotify" is running then
+  tell application "Spotify"
+    set ctrack to ""
+    set ctrack to ctrack & my escape_quotes(current track's artist) & "-"
+    set ctrack to ctrack & my escape_quotes(current track's album)
+  end tell
+else
+  return "Spotify is not running"
+end if
