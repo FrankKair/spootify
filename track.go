@@ -8,10 +8,7 @@ type Track struct {
 	Album  string
 }
 
-func newTrack(appleScriptInfo string) Track {
-	info := strings.Split(string(appleScriptInfo), "-")
-	artist := info[0]
-	album := info[1]
+func newTrack(artist, album string) Track {
 	albumTitle := cleanAlbumTitle(album)
 	return Track{artist, albumTitle}
 }
