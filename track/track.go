@@ -1,4 +1,4 @@
-package main
+package track
 
 import "strings"
 
@@ -8,7 +8,8 @@ type Track struct {
 	Album  string
 }
 
-func newTrack(artist, album string) Track {
+// New creates a Track
+func New(artist, album string) Track {
 	albumTitle := cleanAlbumTitle(album)
 	return Track{artist, albumTitle}
 }

@@ -1,4 +1,4 @@
-package main
+package lastfm
 
 // AlbumInfo type
 type AlbumInfo struct {
