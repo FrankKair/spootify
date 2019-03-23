@@ -1,4 +1,4 @@
-package main
+package lastfm
 
 import (
 	"errors"
@@ -6,12 +6,14 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/FrankKair/spootify/track"
 	"github.com/yhat/scrape"
 
 	"golang.org/x/net/html"
 )
 
-func getLastfmInfo(track Track) (AlbumInfo, error) {
+// GetInfo returns information from Last.fm
+func GetInfo(track track.Track) (AlbumInfo, error) {
 	url := getLastfmURL(track)
 
 	resp, err := http.Get(url)
@@ -40,7 +42,7 @@ func getLastfmInfo(track Track) (AlbumInfo, error) {
 	return AlbumInfo{}, errors.New("Could not fetch album info")
 }
 
-func getLastfmURL(track Track) string {
+func getLastfmURL(track track.Track) string {
 	artist := strings.Replace(track.Artist, " ", "+", -1)
 	album := strings.Replace(track.Album, " ", "+", -1)
 	return fmt.Sprintf("https://www.last.fm/music/%s/%s/+wiki", artist, album)

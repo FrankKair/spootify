@@ -1,30 +1,31 @@
-package main
+package applescript
 
 import (
 	"errors"
 	"fmt"
 
+	"github.com/FrankKair/spootify/track"
 	"github.com/everdev/mack"
 )
 
-// Runs AppleScript "tell" and returns a Track{artist, album}
-func runAppleScript() (Track, error) {
+// Run AppleScript "tell" and returns a Track{artist, album}
+func Run() (track.Track, error) {
 	err := isRunning()
 	if err != nil {
-		return Track{}, err
+		return track.Track{}, err
 	}
 
 	artist, err := artist()
 	if err != nil {
-		return Track{}, err
+		return track.Track{}, err
 	}
 
 	album, err := album()
 	if err != nil {
-		return Track{}, err
+		return track.Track{}, err
 	}
 
-	track := newTrack(artist, album)
+	track := track.New(artist, album)
 	return track, nil
 }
 
