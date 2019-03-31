@@ -45,5 +45,8 @@ func GetInfo(track track.Track) (AlbumInfo, error) {
 func getLastfmURL(track track.Track) string {
 	artist := strings.Replace(track.Artist, " ", "+", -1)
 	album := strings.Replace(track.Album, " ", "+", -1)
+	if strings.Contains(album, "/") {
+		album = strings.Replace(album, "/", "%2F", -1)
+	}
 	return fmt.Sprintf("https://www.last.fm/music/%s/%s/+wiki", artist, album)
 }
