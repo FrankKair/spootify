@@ -25,7 +25,12 @@ func Run() (track.Track, error) {
 		return track.Track{}, err
 	}
 
-	track := track.New(artist, album)
+	song, err := song()
+	if err != nil {
+		return track.Track{}, err
+	}
+
+	track := track.New(artist, album, song)
 	return track, nil
 }
 
@@ -78,4 +83,19 @@ func album() (string, error) {
 	}
 
 	return album, nil
+}
+
+func song() (string, error) {
+	const songCmd = `
+	set ctrack to ""
+	set ctrack to ctrack & (current track's name)
+	`
+
+	song, err := mack.Tell("Spotify", songCmd)
+	if err != nil {
+		e := fmt.Sprintf("Could not exectute AppleScript properly: %s", err)
+		return "", errors.New(e)
+	}
+
+	return song, nil
 }

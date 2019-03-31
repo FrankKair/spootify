@@ -1,32 +1,48 @@
 package track
 
-import "strings"
+import (
+	"strings"
+)
 
 // Track type
 type Track struct {
 	Artist string
 	Album  string
+	Title  string
 }
 
 // New creates a Track
-func New(artist, album string) Track {
-	albumTitle := cleanAlbumTitle(album)
-	return Track{artist, albumTitle}
+func New(artist, album, title string) Track {
+	albumTitle := clean(album)
+	songTitle := clean(title)
+	return Track{artist, albumTitle, songTitle}
 }
 
-func cleanAlbumTitle(title string) string {
-	title = strings.TrimSpace(title)
+func clean(title string) string {
+	delimiter := []string{
+		"-",
+		"(",
+	}
+
 	extras := []string{
+		"Remaster",
+		"Remastered",
+		"Single",
 		"(Remastered)",
 		"(Remastered Version)",
 		"(Deluxe)",
 		"(Deluxe Edition)",
 	}
 
-	for i := range extras {
-		if strings.Contains(title, extras[i]) {
-			sliceIndex := strings.Index(title, "(") - 1
-			return title[:sliceIndex]
+	for i := range delimiter {
+		if strings.Contains(title, delimiter[i]) {
+			index := strings.Index(title, delimiter[i])
+			subString := title[index:]
+			for j := range extras {
+				if strings.Contains(subString, extras[j]) {
+					return strings.TrimSpace(title[:index])
+				}
+			}
 		}
 	}
 
