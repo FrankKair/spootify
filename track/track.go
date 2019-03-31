@@ -31,6 +31,7 @@ func clean(title string) string {
 		"(Remastered)",
 		"(Remastered Version)",
 		"(Deluxe)",
+		"(Deluxe Version)",
 		"(Deluxe Edition)",
 	}
 
