@@ -21,14 +21,13 @@ func main() {
 	printLyrics(lyrics.GetLyrics(track))
 }
 
-func printAlbumInfo(info lastfm.AlbumInfo, err error) {
+func printAlbumInfo(info string, err error) {
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
 
-	fmt.Println(info.URL)
-	fmt.Println(info.Info)
+	fmt.Println(info)
 	fmt.Println("")
 }
 

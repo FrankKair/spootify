@@ -13,33 +13,33 @@ import (
 )
 
 // GetInfo returns information from Last.fm
-func GetInfo(track track.Track) (AlbumInfo, error) {
+func GetInfo(track track.Track) (string, error) {
 	url := getLastfmURL(track)
 
 	resp, err := http.Get(url)
 	if err != nil {
 		e := fmt.Sprintf("Could not access the URL: %s", err)
-		return AlbumInfo{}, errors.New(e)
+		return "", errors.New(e)
 	}
 
 	root, err := html.Parse(resp.Body)
 	if err != nil {
 		e := fmt.Sprintf("Could not parse the HTML body: %s", err)
-		return AlbumInfo{}, errors.New(e)
+		return "", errors.New(e)
 	}
 
 	node, ok := scrape.Find(root, scrape.ByClass("wiki-content"))
 	if ok {
-		return AlbumInfo{url, scrape.Text(node)}, nil
+		return scrape.Text(node), nil
 	}
 
 	// We don't have a wiki here yet...
 	node, ok = scrape.Find(root, scrape.ByClass("wiki"))
 	if ok {
-		return AlbumInfo{url, scrape.Text(node)}, nil
+		return scrape.Text(node), nil
 	}
 
-	return AlbumInfo{}, errors.New("Could not fetch album info")
+	return "", errors.New("Could not fetch album info")
 }
 
 func getLastfmURL(track track.Track) string {
