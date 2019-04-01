@@ -17,28 +17,23 @@ func main() {
 	}
 
 	fmt.Printf("%s - %s - %s \n\n", track.Artist, track.Album, track.Title)
-	printAlbumInfo(lastfm.GetInfo(track))
-	printLyrics(lyrics.GetLyrics(track))
-}
-
-func printAlbumInfo(info string, err error) {
+	info, err := lastfm.GetInfo(track)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
 
-	fmt.Println(info)
-	fmt.Println("")
-}
+	fmt.Println("* ALBUM INFORMATION:")
+	fmt.Printf("%s\n\n", info)
 
-func printLyrics(lyrics []string, err error) {
+	lyrics, err := lyrics.GetLyrics(track)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
 
+	fmt.Println("* LYRICS:")
 	for verse := range lyrics {
 		fmt.Println(lyrics[verse])
 	}
-	fmt.Println("")
 }
