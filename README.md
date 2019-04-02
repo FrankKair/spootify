@@ -1,17 +1,15 @@
 # spootify
 
-`spootify` uses [Last.fm](https://www.last.fm/) wiki section to fetch information about the album you're currently listening to.
+`spootify` fetches information / lyrics about the album / song you're currently listening to.
 
 This utility is **macOS** only since it uses **AppleScript** to get information from Spotify.
 
 ### Usage
 
-Run `go install` to install the package and then call `spootify` on your terminal. You should see something like:
+Download the [binary release](https://github.com/FrankKair/spootify/releases) or clone the repo, run `go get` and `go install` to install the package and then call `spootify` on your terminal. You should see:
 
-```
-https://www.last.fm/music/Led+Zeppelin/Led+Zeppelin+II/+wiki
-Led Zeppelin II is the second studio album by English rock band Led Zeppelin...
-```
+
+<img src = https://raw.githubusercontent.com/FrankKair/spootify/master/assets/terminal.png width=80% height=80%/>
 
 ### Motivation
 
