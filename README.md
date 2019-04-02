@@ -6,12 +6,10 @@ This utility is **macOS** only since it uses **AppleScript** to get information 
 
 ### Usage
 
-Run `go install` to install the package and then call `spootify` on your terminal. You should see something like:
+Download the [binary release](https://github.com/FrankKair/spootify/releases) or clone the repo, run `go get` and `go install` to install the package and then call `spootify` on your terminal. You should see:
 
-```
-https://www.last.fm/music/Led+Zeppelin/Led+Zeppelin+II/+wiki
-Led Zeppelin II is the second studio album by English rock band Led Zeppelin...
-```
+
+<img src = https://raw.githubusercontent.com/FrankKair/spootify/master/assets/terminal.png width=75% height=75%/>
 
 ### Motivation
 
