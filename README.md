@@ -1,5 +1,7 @@
 # spootify
 
+[![Build Status](https://travis-ci.org/FrankKair/spootify.svg?branch=master)](https://travis-ci.org/FrankKair/spootify)
+
 `spootify` fetches information / lyrics about the album / song you're currently listening to.
 
 This utility is **macOS** only since it uses **AppleScript** to get information from Spotify.
