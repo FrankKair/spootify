@@ -49,7 +49,7 @@ func isRunning() error {
 	}
 
 	if isRunning == "false" {
-		return errors.New("Spotify is not running, please open the app")
+		return errors.New("Spotify is either not installed or running")
 	}
 
 	return nil
@@ -63,8 +63,11 @@ func artist() (string, error) {
 
 	artist, err := mack.Tell("Spotify", artistCmd)
 	if err != nil {
-		e := fmt.Sprintf("Could not exectute AppleScript properly: %s", err)
-		return "", errors.New(e)
+		const errMsg =`
+    		Could not fetch the artist/song from Spotify.
+    		Are you logged in? Is there any music playing on the app?
+    		`
+		return "", errors.New(errMsg)
 	}
 
 	return artist, nil
