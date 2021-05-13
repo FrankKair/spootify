@@ -1,4 +1,4 @@
-package lastfm
+package info
 
 import (
 	"errors"
@@ -12,8 +12,8 @@ import (
 	"golang.org/x/net/html"
 )
 
-// GetInfo returns information from Last.fm
-func GetInfo(track track.Track) (string, error) {
+// Get returns information from Last.fm
+func lastfm(track track.Track) (string, error) {
 	url := getLastfmURL(track)
 
 	resp, err := http.Get(url)

@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/FrankKair/spootify/applescript"
-	"github.com/FrankKair/spootify/lastfm"
+	"github.com/FrankKair/spootify/info"
 	"github.com/FrankKair/spootify/lyrics"
 )
 
@@ -17,7 +17,7 @@ func main() {
 	}
 
 	fmt.Printf("%s - %s - %s \n\n", track.Artist, track.Album, track.Title)
-	info, err := lastfm.GetInfo(track)
+	info, err := info.Get(track)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
@@ -26,7 +26,7 @@ func main() {
 	fmt.Println("* ALBUM INFORMATION:")
 	fmt.Printf("%s\n\n", info)
 
-	lyrics, err := lyrics.GetLyrics(track)
+	lyrics, err := lyrics.Get(track)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)

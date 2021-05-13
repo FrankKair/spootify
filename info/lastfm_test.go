@@ -1,4 +1,4 @@
-package lastfm
+package info
 
 import (
 	"testing"
