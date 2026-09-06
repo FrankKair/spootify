@@ -1,17 +1,36 @@
 # spootify
 
-[![Build Status](https://travis-ci.org/FrankKair/spootify.svg?branch=master)](https://travis-ci.org/FrankKair/spootify)
-
 `spootify` fetches information / lyrics about the album / song you're currently listening to.
 
 This utility is **macOS** only since it uses **AppleScript** to get information from Spotify.
 
+### Setup
+
+1. Get a free Last.fm API key at https://www.lastfm/api.account/create
+2. Export it in your shell:
+    ```bash
+    export LASTFM_API_KEY="your-key-here"
+    ```
+    (add this to your `~/.zshrc` or `~/.bashrc` to persist it)
+
+> **Note:** The Last.fm API is free for non-commercial use with no hard rate limit -- they just ask you to be reasonable (< 5 req/s). Lyrics come from [lrclib.net](https://www.lrclib.net), which requires no API key at all.
+
 ### Usage
 
-Download the [binary release](https://github.com/FrankKair/spootify/releases) or clone the repo, run `go get` and `go install` to install the package and then call `spootify` on your terminal. You should see:
+Download the [binary release](https://github.com/FrankKair/spootify/releases) or clone the repo and install:
 
+```bash
+make install
+```
 
-<img src = https://raw.githubusercontent.com/FrankKair/spootify/master/assets/terminal.png width=80% height=80%/>
+Then call `spootify` on your terminal while Spotify is playing:
+
+```bash
+spootify            # show album info + lyrics
+spootify -lyrics    # show only lyrics
+spootify -info      # show only album info
+spootify -version   # print version
+```
 
 ### Motivation
 

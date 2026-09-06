@@ -1,52 +1,74 @@
 package info
 
 import (
-	"errors"
+	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
+	"regexp"
 	"strings"
+	"time"
 
 	"github.com/FrankKair/spootify/track"
-	"github.com/yhat/scrape"
-
-	"golang.org/x/net/html"
 )
 
-// Get returns information from Last.fm
-func lastfm(track track.Track) (string, error) {
-	url := getLastfmURL(track)
+var httpClient = &http.Client{Timeout: 10 * time.Second}
 
-	resp, err := http.Get(url)
-	if err != nil {
-		e := fmt.Sprintf("Could not access the URL: %s", err)
-		return "", errors.New(e)
-	}
+var htmlTagRe = regexp.MustCompile(`<[^>]*>`)
 
-	root, err := html.Parse(resp.Body)
-	if err != nil {
-		e := fmt.Sprintf("Could not parse the HTML body: %s", err)
-		return "", errors.New(e)
-	}
-
-	node, ok := scrape.Find(root, scrape.ByClass("wiki-content"))
-	if ok {
-		return scrape.Text(node), nil
-	}
-
-	// We don't have a wiki here yet...
-	node, ok = scrape.Find(root, scrape.ByClass("wiki"))
-	if ok {
-		return scrape.Text(node), nil
-	}
-
-	return "", errors.New("Could not fetch album info")
+type lastFmResponse struct {
+	Album struct {
+		Wiki struct {
+			Summary string `json:"summary"`
+			Content	string `json:"content"`
+		} `json:"wiki"`
+	} `json:"album"`
+	Error	int	   `json:"error"`
+	Message string `json:"message"`
 }
 
-func getLastfmURL(track track.Track) string {
-	artist := strings.Replace(track.Artist, " ", "+", -1)
-	album := strings.Replace(track.Album, " ", "+", -1)
-	if strings.Contains(album, "/") {
-		album = strings.Replace(album, "/", "%2F", -1)
+const userAgent = "spootify"
+
+func lastfm(track track.Track, apiKey string) (string, error) {
+	req, err := http.NewRequest("GET", getLastfmURL(track, apiKey), nil)
+	if err != nil {
+		return "", fmt.Errorf("could not build Last.fm request: %w", err)
 	}
-	return fmt.Sprintf("https://www.last.fm/music/%s/%s/+wiki", artist, album)
+	req.Header.Set("User-Agent", userAgent)
+
+	resp, err := httpClient.Do(req)
+	if err != nil {
+		return "", fmt.Errorf("could not reach Last.fm API: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return "", fmt.Errorf("Last.API returned status %d", resp.StatusCode)
+	}
+
+	var result lastFmResponse
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		return "", fmt.Errorf("could not parse Last.fm response: %w", err)
+	}
+
+	if result.Error != 0 {
+		return "", fmt.Errorf("Last.fm API error: %s", result.Message)
+	}
+
+	summary := strings.TrimSpace(htmlTagRe.ReplaceAllString(result.Album.Wiki.Summary, ""))
+	if summary == "" {
+		return "", fmt.Errorf("no album info found for %s - %s", track.Artist, track.Album)
+	}
+
+	return summary, nil
+}
+
+func getLastfmURL(track track.Track, apiKey string) string {
+	v := url.Values{}
+	v.Set("method", "album.getinfo")
+	v.Set("api_key", apiKey)
+	v.Set("artist", track.Artist)
+	v.Set("album", track.Album)
+	v.Set("format", "json")
+	return "https://ws.audioscrobbler.com/2.0/?" + v.Encode()
 }

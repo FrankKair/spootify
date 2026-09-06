@@ -1,104 +1,32 @@
 package applescript
 
 import (
-	"errors"
 	"fmt"
+	"os/exec"
+	"strings"
 
 	"github.com/FrankKair/spootify/track"
-	"github.com/everdev/mack"
 )
 
-// Run AppleScript "tell" and returns a Track{artist, album}
+const tellSpotify = `tell application "Spotify"
+set info to (current track's artist) & "|||" & (current track's album) & "|||" & (current track's name)
+end tell`
+
+// Run executes an AppleScript command to get the current Spotify track.
 func Run() (track.Track, error) {
-	err := isRunning()
+	out, err := exec.Command("osascript", "-e", tellSpotify).CombinedOutput()
 	if err != nil {
-		return track.Track{}, err
+		return track.Track{}, fmt.Errorf(
+			"could not fetch track from Spotify -- is it running and playing music? (%s)",
+			strings.TrimSpace(string(out)),
+		)
 	}
 
-	artist, err := artist()
-	if err != nil {
-		return track.Track{}, err
+	result := strings.TrimSpace(string(out))
+	parts := strings.SplitN(result, "|||", 3)
+	if len(parts) != 3 {
+		return track.Track{}, fmt.Errorf("unexpected AppleScript output: %s", result)
 	}
 
-	album, err := album()
-	if err != nil {
-		return track.Track{}, err
-	}
-
-	song, err := song()
-	if err != nil {
-		return track.Track{}, err
-	}
-
-	track := track.New(artist, album, song)
-	return track, nil
-}
-
-func isRunning() error {
-	const isRunningCmd = `
-	if it is running then
-		return true
-	else
-		return false
-	end if
-	`
-
-	isRunning, err := mack.Tell("Spotify", isRunningCmd)
-	if err != nil {
-		return errors.New("Could not exectute AppleScript properly")
-	}
-
-	if isRunning == "false" {
-		return errors.New("Spotify is either not installed or running")
-	}
-
-	return nil
-}
-
-func artist() (string, error) {
-	const artistCmd = `
-	set ctrack to ""
-	set ctrack to ctrack & (current track's artist)
-	`
-
-	artist, err := mack.Tell("Spotify", artistCmd)
-	if err != nil {
-		const errMsg =`
-    		Could not fetch the artist/song from Spotify.
-    		Are you logged in? Is there any music playing on the app?
-    		`
-		return "", errors.New(errMsg)
-	}
-
-	return artist, nil
-}
-
-func album() (string, error) {
-	const albumCmd = `
-	set ctrack to ""
-	set ctrack to ctrack & (current track's album)
-	`
-
-	album, err := mack.Tell("Spotify", albumCmd)
-	if err != nil {
-		e := fmt.Sprintf("Could not exectute AppleScript properly: %s", err)
-		return "", errors.New(e)
-	}
-
-	return album, nil
-}
-
-func song() (string, error) {
-	const songCmd = `
-	set ctrack to ""
-	set ctrack to ctrack & (current track's name)
-	`
-
-	song, err := mack.Tell("Spotify", songCmd)
-	if err != nil {
-		e := fmt.Sprintf("Could not exectute AppleScript properly: %s", err)
-		return "", errors.New(e)
-	}
-
-	return song, nil
+	return track.New(parts[0], parts[1], parts[2]), nil
 }

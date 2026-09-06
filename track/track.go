@@ -4,48 +4,51 @@ import (
 	"strings"
 )
 
-// Track type
+// Track holds the currently playing song's metadata.
 type Track struct {
 	Artist string
 	Album  string
 	Title  string
 }
 
-// New creates a Track
+// New creates a Track, stripping common Spotify suffixes like
+// "Remastered", "Deluxe Edition", etc. from album and song titles.
 func New(artist, album, title string) Track {
-	albumTitle := clean(album)
-	songTitle := clean(title)
-	return Track{artist, albumTitle, songTitle}
+	return Track{
+		Artist: artist,
+		Album:  clean(album),
+		Title:  clean(title),
+	}
+}
+
+// delimiters marks where a suffix region might begin.
+var delimiters = []string{" - ", " (", " ["}
+
+// suffixKeywords are matched case-insensitively inside the suffix region.
+var suffixKeywords = []string{
+	"remaster",
+	"deluxe",
+	"single",
+	"bonus track",
+	"expanded",
+	"anniversary",
+	"special edition",
+	"super deluxe",
 }
 
 func clean(title string) string {
-	delimiter := []string{
-		"-",
-		"(",
-	}
-
-	extras := []string{
-		"Remaster",
-		"Remastered",
-		"Single",
-		"(Remastered)",
-		"(Remastered Version)",
-		"(Deluxe)",
-		"(Deluxe Version)",
-		"(Deluxe Edition)",
-	}
-
-	for i := range delimiter {
-		if strings.Contains(title, delimiter[i]) {
-			index := strings.Index(title, delimiter[i])
-			subString := title[index:]
-			for j := range extras {
-				if strings.Contains(subString, extras[j]) {
-					return strings.TrimSpace(title[:index])
-				}
+	lower := strings.ToLower(title)
+	for _, d := range delimiters {
+		idx := strings.Index(lower, d)
+		if idx < 0 {
+			continue
+		}
+		suffix := lower[idx:]
+		for _, kw := range suffixKeywords {
+			if strings.Contains(suffix, kw) {
+				return strings.TrimSpace(title[:idx])
 			}
 		}
 	}
-
 	return title
 }
