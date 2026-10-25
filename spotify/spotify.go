@@ -4,7 +4,9 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"os"
 	"os/exec"
 	"strings"
 	"time"
@@ -36,18 +38,47 @@ func run(ctx context.Context, executable string) (track.Track, error) {
 		if ctx.Err() != nil {
 			err = ctx.Err()
 		}
-		return track.Track{}, fmt.Errorf("could not fetch track from Spotify (is it running and playing music?): %w (%s)", err, strings.TrimSpace(stderr.String()))
+		return track.Track{}, executionError(err, stderr.String())
 	}
 	return parse(out)
+}
+
+type spotifyError struct {
+	message string
+	cause   error
+}
+
+// Satisfies type error interface { Error() string }
+func (e *spotifyError) Error() string { return e.message }
+func (e *spotifyError) Unwrap() error { return e.cause }
+
+func executionError(cause error, diagnostic string) error {
+	diagnostic = strings.ToLower(diagnostic)
+	message := "Could not read the current track. Open Spotify and play a song."
+	switch {
+	case errors.Is(cause, context.DeadlineExceeded):
+		message = "Spotify took too long to respond. Try again."
+	case errors.Is(cause, context.Canceled):
+		message = "Reading Spotify was canceled."
+	case errors.Is(cause, os.ErrNotExist), errors.Is(cause, exec.ErrNotFound):
+		message = "The macOS scripting tool (osascript) is unavailable."
+	case strings.Contains(diagnostic, "application can't be found"):
+		message = "Spotify could not be found. Install the Spotify desktop app and try again."
+	case strings.Contains(diagnostic, "spotify is not running"):
+		message = "Spotify is not running. Open Spotify and play a song."
+	case strings.Contains(diagnostic, "(-1743)"), strings.Contains(diagnostic, "not authorized"), strings.Contains(diagnostic, "permission denied"):
+		message = "Allow your terminal to control Spotify in System Settings > Privacy & Security > Automation."
+	}
+	return &spotifyError{message: message, cause: cause}
 }
 
 func parse(out []byte) (track.Track, error) {
 	var result track.Track
 	if err := json.Unmarshal(out, &result); err != nil {
-		return track.Track{}, fmt.Errorf("could not parse Spotify metadata: %w", err)
+		return track.Track{}, &spotifyError{message: "Spotify returned unreadable track information. Try playing another song.", cause: err}
 	}
 	if strings.TrimSpace(result.Artist) == "" || strings.TrimSpace(result.Title) == "" {
-		return track.Track{}, fmt.Errorf("Spotify returned no artist or title; is a music track selected?")
+		return track.Track{}, fmt.Errorf("No music track is selected. Play a song in Spotify and try again.")
 	}
 	return result, nil
 }
