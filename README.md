@@ -4,34 +4,50 @@
 
 `spootify` fetches information / lyrics about the album / song you're currently listening to.
 
-This utility is **macOS** only since it uses **AppleScript** to get information from Spotify.
+Requires **macOS** and the **Spotify desktop app**.
 
-### Setup
+## Install
 
-1. Get a free Last.fm API key at https://www.lastfm/api.account/create
-2. Export it in your shell:
-    ```bash
-    export LASTFM_API_KEY="your-key-here"
-    ```
-    (add this to your `~/.zshrc` or `~/.bashrc` to persist it)
-
-> **Note:** The Last.fm API is free for non-commercial use with no hard rate limit -- they just ask you to be reasonable (< 5 req/s). Lyrics come from [lrclib.net](https://www.lrclib.net), which requires no API key at all.
-
-### Usage
-
-Download the [binary release](https://github.com/FrankKair/spootify/releases) or clone the repo and install:
+With Go 1.25+:
 
 ```bash
-make install
+go install github.com/FrankKair/spootify@latest
 ```
 
-Then call `spootify` on your terminal while Spotify is playing:
+Ensure Go's binary directory (usually `~/go/bin`) is on your `PATH`.
+
+Without Go, download the [latest binary](https://github.com/FrankKair/spootify/releases/latest): `darwin-arm64` for Apple Silicon or `darwin-x64` for Intel. Rename it to `spootify`, run `chmod +x spootify`, and place it in a directory on your `PATH`.
+
+## Setup
+
+For album information, get a [Last.fm API key](https://www.last.fm/api/account/create) and add it to your shell configuration:
+
+```bash
+export LASTFM_API_KEY="your-key-here"
+```
+
+Lyrics work without a key, via [LRCLIB](https://lrclib.net).
+
+## Usage
+
+Open Spotify and play a song, then run:
 
 ```bash
 spootify            # show album info + lyrics
 spootify -lyrics    # show only lyrics
 spootify -info      # show only album info
 ```
+
+## Build from source
+
+```bash
+git clone https://github.com/FrankKair/spootify.git
+cd spootify
+make build
+./spootify
+```
+
+Use `make test` to run tests or `make install` to install your checkout.
 
 ### Motivation
 
