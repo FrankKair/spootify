@@ -31,7 +31,6 @@ Then call `spootify` on your terminal while Spotify is playing:
 spootify            # show album info + lyrics
 spootify -lyrics    # show only lyrics
 spootify -info      # show only album info
-spootify -version   # print version
 ```
 
 ### Motivation

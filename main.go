@@ -6,31 +6,26 @@ import (
 	"os"
 	"sync"
 
-	"github.com/FrankKair/spootify/applescript"
 	"github.com/FrankKair/spootify/info"
 	"github.com/FrankKair/spootify/lyrics"
+	"github.com/FrankKair/spootify/spotify"
+	"github.com/FrankKair/spootify/track"
 )
 
-var version = "dev"
-
 func main() {
-	showVersion := flag.Bool("version", false, "print version and exit")
 	lyricsOnly := flag.Bool("lyrics", false, "show only lyrics")
 	infoOnly := flag.Bool("info", false, "show only album info")
 	flag.Parse()
 
-	if *showVersion {
-		fmt.Println("spootify", version)
-		return
-	}
-
-	track, err := applescript.Run()
+	song, err := spotify.Run()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 
-	fmt.Printf("%s - %s - %s\n\n", track.Artist, track.Album, track.Title)
+	fmt.Printf("%s - %s - %s\n\n", song.Artist, song.Album, song.Title)
+
+	lookupTrack := track.New(song.Artist, song.Album, song.Title)
 
 	apiKey := os.Getenv("LASTFM_API_KEY")
 	showInfo := !*lyricsOnly
@@ -53,13 +48,13 @@ func main() {
 
 	if showInfo {
 		wg.Go(func() {
-			albumInfo, albumInfoErr = info.Get(track, apiKey)
+			albumInfo, albumInfoErr = info.Get(lookupTrack, apiKey)
 		})
 	}
 
 	if showLyrics {
 		wg.Go(func() {
-			lyricsLines, lyricsErr = lyrics.Get(track)
+			lyricsLines, lyricsErr = lyrics.Get(lookupTrack)
 		})
 	}
 

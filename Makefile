@@ -1,14 +1,13 @@
-VERSION ?= $(shell git describe --tags --always --dirty 2>/dev/null || echo dev)
-TARGET  ?= app
+TARGET  ?= spootify
 
 build: ## Build the binary
-	go build -ldflags "-X main.version=$(VERSION)" -o $(TARGET) .
+	go build -o $(TARGET) .
 
 run: build ## Build and run
 	./$(TARGET)
 
 install: ## Install the binary
-	go install -ldflags "-X main.version=$(VERSION)" .
+	go install .
 
 fmt: ## Format source code
 	go fmt ./...

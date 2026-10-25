@@ -22,6 +22,14 @@ func TestClean(t *testing.T) {
 		{"no suffix", "OK Computer", "OK Computer"},
 		{"dash no keyword", "Hide and Seek - Live", "Hide and Seek - Live"},
 		{"parenthesized no keyword", "Song (feat. Someone)", "Song (feat. Someone)"},
+		{"unicode byte lengths", "İstanbul (Remastered)", "İstanbul"},
+		{"preserve live subtitle", "Song (Live) - 2020 Remaster", "Song (Live)"},
+		{"preserve keyword in subtitle", "Song (Single Ladies)", "Song (Single Ladies)"},
+		{"preserve keyword in longer subtitle", "Song (Remastered Memories)", "Song (Remastered Memories)"},
+		{"repeated suffixes", "Album (Deluxe Edition) [Remastered]", "Album"},
+		{"nested meaningful subtitle", "Song (Part One) (Remastered)", "Song (Part One)"},
+		{"year after remaster", "Song - Remastered 2011", "Song"},
+		{"unclosed parentheses", "Song (Remastered", "Song (Remastered"},
 		{"empty string", "", ""},
 		{"case insensitive", "Album (REMASTERED)", "Album"},
 	}
@@ -41,7 +49,7 @@ func TestNew(t *testing.T) {
 	if tr.Artist != "Led Zeppelin" {
 		t.Errorf("Artist = %q, want %q", tr.Artist, "Led Zeppelin")
 	}
-	if tr.Album!= "Led Zeppelin II" {
+	if tr.Album != "Led Zeppelin II" {
 		t.Errorf("Album = %q, want %q", tr.Album, "Led Zeppelin II")
 	}
 	if tr.Title != "Whole Lotta Love" {
